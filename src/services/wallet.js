@@ -10,43 +10,37 @@ const getCustomRegistry = () => {
   // Start with the default registry types
   const registry = new Registry(defaultRegistryTypes);
   
-  // Register your custom message types
+  // Register your custom message types - FIXED IMPLEMENTATION
   registry.register('/erprollup.ledger.MsgCreateGroup', {
     typeUrl: '/erprollup.ledger.MsgCreateGroup',
-    encode: (value) => {
-      return {
-        creator: value.creator,
-        name: value.name,
-        description: value.description
-      };
-    }
+    encode: (value) => ({
+      creator: value.creator,
+      name: value.name,
+      description: value.description
+    })
   });
   
   registry.register('/erprollup.ledger.MsgCreateJournalEntry', {
     typeUrl: '/erprollup.ledger.MsgCreateJournalEntry',
-    encode: (value) => {
-      return {
-        creator: value.creator,
-        description: value.description,
-        debitGroup: value.debitGroup,
-        creditGroup: value.creditGroup,
-        amount: value.amount
-      };
-    }
+    encode: (value) => ({
+      creator: value.creator,
+      description: value.description,
+      debitGroup: value.debitGroup,
+      creditGroup: value.creditGroup,
+      amount: value.amount
+    })
   });
   
   registry.register('/erprollup.ledger.MsgSendAndRecord', {
     typeUrl: '/erprollup.ledger.MsgSendAndRecord',
-    encode: (value) => {
-      return {
-        creator: value.creator,
-        receiver: value.receiver,
-        amount: value.amount,
-        debitGroup: value.debitGroup,
-        creditGroup: value.creditGroup,
-        description: value.description
-      };
-    }
+    encode: (value) => ({
+      creator: value.creator,
+      receiver: value.receiver,
+      amount: value.amount,
+      debitGroup: value.debitGroup,
+      creditGroup: value.creditGroup,
+      description: value.description
+    })
   });
   
   return registry;
@@ -67,8 +61,7 @@ export const createWalletFromMnemonic = async (mnemonic) => {
   }
 };
 
-// Create a wallet from private key (Note: This is not directly supported by CosmJS)
-// This is a placeholder and would require additional libraries
+// Create a wallet from private key (placeholder - would require additional libraries)
 export const createWalletFromPrivateKey = async (privateKey) => {
   throw new Error('Private key import is not implemented yet');
 };
@@ -77,14 +70,13 @@ export const createWalletFromPrivateKey = async (privateKey) => {
 export const initSigningClient = async (wallet) => {
   try {
     // RPC endpoint would be different than REST API
-    // You might need to adjust this based on your setup
     const rpcEndpoint = 'http://212.90.121.86:26657';
     
     // Initialize with custom registry
     const registry = getCustomRegistry();
     return await SigningStargateClient.connectWithSigner(
       rpcEndpoint, 
-      wallet,
+      wallet, 
       { registry }
     );
   } catch (error) {
@@ -109,7 +101,6 @@ export const createGroup = async (wallet, name, description) => {
   try {
     const client = await initSigningClient(wallet);
     const [account] = await wallet.getAccounts();
-    const chainId = await fetchChainId();
     
     const msg = {
       typeUrl: "/erprollup.ledger.MsgCreateGroup",
@@ -149,7 +140,6 @@ export const createJournalEntry = async (wallet, description, debitGroupId, cred
   try {
     const client = await initSigningClient(wallet);
     const [account] = await wallet.getAccounts();
-    const chainId = await fetchChainId();
     
     const msg = {
       typeUrl: "/erprollup.ledger.MsgCreateJournalEntry",
@@ -168,8 +158,7 @@ export const createJournalEntry = async (wallet, description, debitGroupId, cred
           denom: "stake",
           amount: "50",
         },
-      ],
-      gas: "200000",
+      ]
     };
 
     const result = await client.signAndBroadcast(
@@ -191,7 +180,6 @@ export const sendAndRecord = async (wallet, receiverAddress, amount, denom, debi
   try {
     const client = await initSigningClient(wallet);
     const [account] = await wallet.getAccounts();
-    const chainId = await fetchChainId();
     
     const msg = {
       typeUrl: "/erprollup.ledger.MsgSendAndRecord",
@@ -214,8 +202,7 @@ export const sendAndRecord = async (wallet, receiverAddress, amount, denom, debi
           denom: "stake",
           amount: "50",
         },
-      ],
-      gas: "200000",
+      ]
     };
 
     const result = await client.signAndBroadcast(
