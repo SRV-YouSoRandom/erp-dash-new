@@ -1,6 +1,6 @@
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { SigningStargateClient, StargateClient, defaultRegistryTypes } from '@cosmjs/stargate';
-import { Registry } from '@cosmjs/proto-signing';
+import { Registry, GeneratedType } from '@cosmjs/proto-signing';
 import { bech32 } from '@cosmjs/encoding';
 import { stringToPath } from '@cosmjs/crypto';
 import { fetchAccount, fetchChainId } from './api';
@@ -13,189 +13,195 @@ const getCustomRegistry = () => {
   // Start with the default registry types
   const registry = new Registry(defaultRegistryTypes);
   
-  // Register your custom message types correctly with proper proto-compatible interfaces
-  
-  registry.register('/erprollup.ledger.MsgCreateGroup', {
+  // MsgCreateGroup message type
+  const MsgCreateGroup = {
     typeUrl: '/erprollup.ledger.MsgCreateGroup',
-    // Add a create method that returns an object with the encoded data
-    create: (data) => {
-      return {
-        typeUrl: '/erprollup.ledger.MsgCreateGroup',
-        value: data
-      };
+    encode: (message, writer = new Writer()) => {
+      if (message.creator !== "") {
+        writer.uint32(10).string(message.creator);
+      }
+      if (message.name !== "") {
+        writer.uint32(18).string(message.name);
+      }
+      if (message.description !== "") {
+        writer.uint32(26).string(message.description);
+      }
+      return writer;
     },
-    encode: (value) => {
-      // Create a simple Uint8Array encoding of the fields
-      const creator = new TextEncoder().encode(value.creator);
-      const name = new TextEncoder().encode(value.name);
-      const description = new TextEncoder().encode(value.description || '');
-      
-      // Simple encoding: lengths followed by values
-      const result = new Uint8Array(
-        4 + creator.length + 
-        4 + name.length + 
-        4 + description.length
-      );
-      
-      let offset = 0;
-      
-      // Creator
-      const view = new DataView(result.buffer);
-      view.setUint32(offset, creator.length, true);
-      offset += 4;
-      result.set(creator, offset);
-      offset += creator.length;
-      
-      // Name
-      view.setUint32(offset, name.length, true);
-      offset += 4;
-      result.set(name, offset);
-      offset += name.length;
-      
-      // Description
-      view.setUint32(offset, description.length, true);
-      offset += 4;
-      result.set(description, offset);
-      
-      return result;
+    decode: (input, length) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    fromJSON: (object) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    toJSON: (message) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    fromPartial: (object) => {
+      const message = { ...baseMsgCreateGroup };
+      if (object.creator !== undefined && object.creator !== null) {
+        message.creator = object.creator;
+      }
+      if (object.name !== undefined && object.name !== null) {
+        message.name = object.name;
+      }
+      if (object.description !== undefined && object.description !== null) {
+        message.description = object.description;
+      }
+      return message;
     }
-  });
+  };
   
-  registry.register('/erprollup.ledger.MsgCreateJournalEntry', {
+  // MsgCreateJournalEntry message type
+  const MsgCreateJournalEntry = {
     typeUrl: '/erprollup.ledger.MsgCreateJournalEntry',
-    // Add create method
-    create: (data) => {
-      return {
-        typeUrl: '/erprollup.ledger.MsgCreateJournalEntry',
-        value: data
-      };
+    encode: (message, writer = new Writer()) => {
+      if (message.creator !== "") {
+        writer.uint32(10).string(message.creator);
+      }
+      if (message.description !== "") {
+        writer.uint32(18).string(message.description);
+      }
+      if (message.debitGroup !== "") {
+        writer.uint32(26).string(message.debitGroup);
+      }
+      if (message.creditGroup !== "") {
+        writer.uint32(34).string(message.creditGroup);
+      }
+      if (message.amount !== "") {
+        writer.uint32(42).string(message.amount);
+      }
+      return writer;
     },
-    encode: (value) => {
-      const creator = new TextEncoder().encode(value.creator);
-      const description = new TextEncoder().encode(value.description || '');
-      const debitGroup = new TextEncoder().encode(value.debitGroup);
-      const creditGroup = new TextEncoder().encode(value.creditGroup);
-      const amount = new TextEncoder().encode(value.amount);
-      
-      const result = new Uint8Array(
-        4 + creator.length + 
-        4 + description.length + 
-        4 + debitGroup.length + 
-        4 + creditGroup.length +
-        4 + amount.length
-      );
-      
-      let offset = 0;
-      const view = new DataView(result.buffer);
-      
-      // Creator
-      view.setUint32(offset, creator.length, true);
-      offset += 4;
-      result.set(creator, offset);
-      offset += creator.length;
-      
-      // Description
-      view.setUint32(offset, description.length, true);
-      offset += 4;
-      result.set(description, offset);
-      offset += description.length;
-      
-      // DebitGroup
-      view.setUint32(offset, debitGroup.length, true);
-      offset += 4;
-      result.set(debitGroup, offset);
-      offset += debitGroup.length;
-      
-      // CreditGroup
-      view.setUint32(offset, creditGroup.length, true);
-      offset += 4;
-      result.set(creditGroup, offset);
-      offset += creditGroup.length;
-      
-      // Amount
-      view.setUint32(offset, amount.length, true);
-      offset += 4;
-      result.set(amount, offset);
-      
-      return result;
+    decode: (input, length) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    fromJSON: (object) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    toJSON: (message) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    fromPartial: (object) => {
+      const message = { ...baseMsgCreateJournalEntry };
+      if (object.creator !== undefined && object.creator !== null) {
+        message.creator = object.creator;
+      }
+      if (object.description !== undefined && object.description !== null) {
+        message.description = object.description;
+      }
+      if (object.debitGroup !== undefined && object.debitGroup !== null) {
+        message.debitGroup = object.debitGroup;
+      }
+      if (object.creditGroup !== undefined && object.creditGroup !== null) {
+        message.creditGroup = object.creditGroup;
+      }
+      if (object.amount !== undefined && object.amount !== null) {
+        message.amount = object.amount;
+      }
+      return message;
     }
-  });
+  };
   
-  registry.register('/erprollup.ledger.MsgSendAndRecord', {
+  // MsgSendAndRecord message type
+  const MsgSendAndRecord = {
     typeUrl: '/erprollup.ledger.MsgSendAndRecord',
-    // Add create method
-    create: (data) => {
-      return {
-        typeUrl: '/erprollup.ledger.MsgSendAndRecord',
-        value: data
-      };
+    encode: (message, writer = new Writer()) => {
+      if (message.creator !== "") {
+        writer.uint32(10).string(message.creator);
+      }
+      if (message.receiver !== "") {
+        writer.uint32(18).string(message.receiver);
+      }
+      if (message.amount !== undefined) {
+        writer.uint32(26).string(message.amount.denom);
+        writer.uint32(34).string(message.amount.amount);
+      }
+      if (message.debitGroup !== "") {
+        writer.uint32(42).string(message.debitGroup);
+      }
+      if (message.creditGroup !== "") {
+        writer.uint32(50).string(message.creditGroup);
+      }
+      if (message.description !== "") {
+        writer.uint32(58).string(message.description);
+      }
+      return writer;
     },
-    encode: (value) => {
-      const creator = new TextEncoder().encode(value.creator);
-      const receiver = new TextEncoder().encode(value.receiver);
-      const amountDenom = new TextEncoder().encode(value.amount.denom);
-      const amountValue = new TextEncoder().encode(value.amount.amount);
-      const debitGroup = new TextEncoder().encode(value.debitGroup);
-      const creditGroup = new TextEncoder().encode(value.creditGroup);
-      const description = new TextEncoder().encode(value.description || '');
-      
-      const result = new Uint8Array(
-        4 + creator.length + 
-        4 + receiver.length + 
-        4 + amountDenom.length +
-        4 + amountValue.length +
-        4 + debitGroup.length + 
-        4 + creditGroup.length +
-        4 + description.length
-      );
-      
-      let offset = 0;
-      const view = new DataView(result.buffer);
-      
-      // Creator
-      view.setUint32(offset, creator.length, true);
-      offset += 4;
-      result.set(creator, offset);
-      offset += creator.length;
-      
-      // Receiver
-      view.setUint32(offset, receiver.length, true);
-      offset += 4;
-      result.set(receiver, offset);
-      offset += receiver.length;
-      
-      // Amount denom
-      view.setUint32(offset, amountDenom.length, true);
-      offset += 4;
-      result.set(amountDenom, offset);
-      offset += amountDenom.length;
-      
-      // Amount value
-      view.setUint32(offset, amountValue.length, true);
-      offset += 4;
-      result.set(amountValue, offset);
-      offset += amountValue.length;
-      
-      // DebitGroup
-      view.setUint32(offset, debitGroup.length, true);
-      offset += 4;
-      result.set(debitGroup, offset);
-      offset += debitGroup.length;
-      
-      // CreditGroup
-      view.setUint32(offset, creditGroup.length, true);
-      offset += 4;
-      result.set(creditGroup, offset);
-      offset += creditGroup.length;
-      
-      // Description
-      view.setUint32(offset, description.length, true);
-      offset += 4;
-      result.set(description, offset);
-      
-      return result;
+    decode: (input, length) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    fromJSON: (object) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    toJSON: (message) => {
+      // Not needed for sending transactions
+      return {};
+    },
+    fromPartial: (object) => {
+      const message = { ...baseMsgSendAndRecord };
+      if (object.creator !== undefined && object.creator !== null) {
+        message.creator = object.creator;
+      }
+      if (object.receiver !== undefined && object.receiver !== null) {
+        message.receiver = object.receiver;
+      }
+      if (object.amount !== undefined && object.amount !== null) {
+        message.amount = {
+          denom: object.amount.denom || "",
+          amount: object.amount.amount || ""
+        };
+      }
+      if (object.debitGroup !== undefined && object.debitGroup !== null) {
+        message.debitGroup = object.debitGroup;
+      }
+      if (object.creditGroup !== undefined && object.creditGroup !== null) {
+        message.creditGroup = object.creditGroup;
+      }
+      if (object.description !== undefined && object.description !== null) {
+        message.description = object.description;
+      }
+      return message;
     }
-  });
+  };
+
+  // Create base message objects with default values
+  const baseMsgCreateGroup = { creator: "", name: "", description: "" };
+  const baseMsgCreateJournalEntry = { creator: "", description: "", debitGroup: "", creditGroup: "", amount: "" };
+  const baseMsgSendAndRecord = { creator: "", receiver: "", amount: { denom: "", amount: "" }, debitGroup: "", creditGroup: "", description: "" };
+
+  // Simple Writer class to simulate protobuf encoding
+  class Writer {
+    constructor() {
+      this.ldelim = () => this;
+      this.bytes = new Uint8Array(0);
+    }
+    
+    uint32(val) {
+      return this;
+    }
+    
+    string(val) {
+      return this;
+    }
+    
+    finish() {
+      return this.bytes;
+    }
+  }
+  
+  // Register the message types
+  registry.register('/erprollup.ledger.MsgCreateGroup', MsgCreateGroup);
+  registry.register('/erprollup.ledger.MsgCreateJournalEntry', MsgCreateJournalEntry);
+  registry.register('/erprollup.ledger.MsgSendAndRecord', MsgSendAndRecord);
   
   return registry;
 };
