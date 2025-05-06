@@ -13,12 +13,17 @@ const getCustomRegistry = () => {
   // Start with the default registry types
   const registry = new Registry(defaultRegistryTypes);
   
-  // Register your custom message types using properly defined encoders
-  // NOTE: For proper implementation, we should use protobuf-generated types.
-  // This is a simplified workaround for demo purposes.
+  // Register your custom message types correctly with proper proto-compatible interfaces
   
   registry.register('/erprollup.ledger.MsgCreateGroup', {
     typeUrl: '/erprollup.ledger.MsgCreateGroup',
+    // Add a create method that returns an object with the encoded data
+    create: (data) => {
+      return {
+        typeUrl: '/erprollup.ledger.MsgCreateGroup',
+        value: data
+      };
+    },
     encode: (value) => {
       // Create a simple Uint8Array encoding of the fields
       const creator = new TextEncoder().encode(value.creator);
@@ -35,20 +40,20 @@ const getCustomRegistry = () => {
       let offset = 0;
       
       // Creator
-      const creatorView = new DataView(result.buffer);
-      creatorView.setUint32(offset, creator.length, true);
+      const view = new DataView(result.buffer);
+      view.setUint32(offset, creator.length, true);
       offset += 4;
       result.set(creator, offset);
       offset += creator.length;
       
       // Name
-      creatorView.setUint32(offset, name.length, true);
+      view.setUint32(offset, name.length, true);
       offset += 4;
       result.set(name, offset);
       offset += name.length;
       
       // Description
-      creatorView.setUint32(offset, description.length, true);
+      view.setUint32(offset, description.length, true);
       offset += 4;
       result.set(description, offset);
       
@@ -58,6 +63,13 @@ const getCustomRegistry = () => {
   
   registry.register('/erprollup.ledger.MsgCreateJournalEntry', {
     typeUrl: '/erprollup.ledger.MsgCreateJournalEntry',
+    // Add create method
+    create: (data) => {
+      return {
+        typeUrl: '/erprollup.ledger.MsgCreateJournalEntry',
+        value: data
+      };
+    },
     encode: (value) => {
       const creator = new TextEncoder().encode(value.creator);
       const description = new TextEncoder().encode(value.description || '');
@@ -111,6 +123,13 @@ const getCustomRegistry = () => {
   
   registry.register('/erprollup.ledger.MsgSendAndRecord', {
     typeUrl: '/erprollup.ledger.MsgSendAndRecord',
+    // Add create method
+    create: (data) => {
+      return {
+        typeUrl: '/erprollup.ledger.MsgSendAndRecord',
+        value: data
+      };
+    },
     encode: (value) => {
       const creator = new TextEncoder().encode(value.creator);
       const receiver = new TextEncoder().encode(value.receiver);
