@@ -1,8 +1,56 @@
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
+import { SigningStargateClient, StargateClient, defaultRegistryTypes } from '@cosmjs/stargate';
+import { Registry } from '@cosmjs/proto-signing';
 import { bech32 } from '@cosmjs/encoding';
 import { stringToPath } from '@cosmjs/crypto';
 import { fetchAccount, fetchChainId } from './api';
+
+// Create a custom registry with ERP Rollup types
+const getCustomRegistry = () => {
+  // Start with the default registry types
+  const registry = new Registry(defaultRegistryTypes);
+  
+  // Register your custom message types
+  registry.register('/erprollup.ledger.MsgCreateGroup', {
+    typeUrl: '/erprollup.ledger.MsgCreateGroup',
+    encode: (value) => {
+      return {
+        creator: value.creator,
+        name: value.name,
+        description: value.description
+      };
+    }
+  });
+  
+  registry.register('/erprollup.ledger.MsgCreateJournalEntry', {
+    typeUrl: '/erprollup.ledger.MsgCreateJournalEntry',
+    encode: (value) => {
+      return {
+        creator: value.creator,
+        description: value.description,
+        debitGroup: value.debitGroup,
+        creditGroup: value.creditGroup,
+        amount: value.amount
+      };
+    }
+  });
+  
+  registry.register('/erprollup.ledger.MsgSendAndRecord', {
+    typeUrl: '/erprollup.ledger.MsgSendAndRecord',
+    encode: (value) => {
+      return {
+        creator: value.creator,
+        receiver: value.receiver,
+        amount: value.amount,
+        debitGroup: value.debitGroup,
+        creditGroup: value.creditGroup,
+        description: value.description
+      };
+    }
+  });
+  
+  return registry;
+};
 
 // Create a wallet from mnemonic
 export const createWalletFromMnemonic = async (mnemonic) => {
@@ -31,7 +79,14 @@ export const initSigningClient = async (wallet) => {
     // RPC endpoint would be different than REST API
     // You might need to adjust this based on your setup
     const rpcEndpoint = 'http://212.90.121.86:26657';
-    return await SigningStargateClient.connectWithSigner(rpcEndpoint, wallet);
+    
+    // Initialize with custom registry
+    const registry = getCustomRegistry();
+    return await SigningStargateClient.connectWithSigner(
+      rpcEndpoint, 
+      wallet,
+      { registry }
+    );
   } catch (error) {
     console.error('Error initializing signing client:', error);
     throw error;
