@@ -4,43 +4,178 @@ import { Registry } from '@cosmjs/proto-signing';
 import { bech32 } from '@cosmjs/encoding';
 import { stringToPath } from '@cosmjs/crypto';
 import { fetchAccount, fetchChainId } from './api';
+import { Any } from 'cosmjs-types/google/protobuf/any';
+import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
+import Long from 'long';
 
 // Create a custom registry with ERP Rollup types
 const getCustomRegistry = () => {
   // Start with the default registry types
   const registry = new Registry(defaultRegistryTypes);
   
-  // Register your custom message types - FIXED IMPLEMENTATION
+  // Register your custom message types using properly defined encoders
+  // NOTE: For proper implementation, we should use protobuf-generated types.
+  // This is a simplified workaround for demo purposes.
+  
   registry.register('/erprollup.ledger.MsgCreateGroup', {
     typeUrl: '/erprollup.ledger.MsgCreateGroup',
-    encode: (value) => ({
-      creator: value.creator,
-      name: value.name,
-      description: value.description
-    })
+    encode: (value) => {
+      // Create a simple Uint8Array encoding of the fields
+      const creator = new TextEncoder().encode(value.creator);
+      const name = new TextEncoder().encode(value.name);
+      const description = new TextEncoder().encode(value.description || '');
+      
+      // Simple encoding: lengths followed by values
+      const result = new Uint8Array(
+        4 + creator.length + 
+        4 + name.length + 
+        4 + description.length
+      );
+      
+      let offset = 0;
+      
+      // Creator
+      const creatorView = new DataView(result.buffer);
+      creatorView.setUint32(offset, creator.length, true);
+      offset += 4;
+      result.set(creator, offset);
+      offset += creator.length;
+      
+      // Name
+      creatorView.setUint32(offset, name.length, true);
+      offset += 4;
+      result.set(name, offset);
+      offset += name.length;
+      
+      // Description
+      creatorView.setUint32(offset, description.length, true);
+      offset += 4;
+      result.set(description, offset);
+      
+      return result;
+    }
   });
   
   registry.register('/erprollup.ledger.MsgCreateJournalEntry', {
     typeUrl: '/erprollup.ledger.MsgCreateJournalEntry',
-    encode: (value) => ({
-      creator: value.creator,
-      description: value.description,
-      debitGroup: value.debitGroup,
-      creditGroup: value.creditGroup,
-      amount: value.amount
-    })
+    encode: (value) => {
+      const creator = new TextEncoder().encode(value.creator);
+      const description = new TextEncoder().encode(value.description || '');
+      const debitGroup = new TextEncoder().encode(value.debitGroup);
+      const creditGroup = new TextEncoder().encode(value.creditGroup);
+      const amount = new TextEncoder().encode(value.amount);
+      
+      const result = new Uint8Array(
+        4 + creator.length + 
+        4 + description.length + 
+        4 + debitGroup.length + 
+        4 + creditGroup.length +
+        4 + amount.length
+      );
+      
+      let offset = 0;
+      const view = new DataView(result.buffer);
+      
+      // Creator
+      view.setUint32(offset, creator.length, true);
+      offset += 4;
+      result.set(creator, offset);
+      offset += creator.length;
+      
+      // Description
+      view.setUint32(offset, description.length, true);
+      offset += 4;
+      result.set(description, offset);
+      offset += description.length;
+      
+      // DebitGroup
+      view.setUint32(offset, debitGroup.length, true);
+      offset += 4;
+      result.set(debitGroup, offset);
+      offset += debitGroup.length;
+      
+      // CreditGroup
+      view.setUint32(offset, creditGroup.length, true);
+      offset += 4;
+      result.set(creditGroup, offset);
+      offset += creditGroup.length;
+      
+      // Amount
+      view.setUint32(offset, amount.length, true);
+      offset += 4;
+      result.set(amount, offset);
+      
+      return result;
+    }
   });
   
   registry.register('/erprollup.ledger.MsgSendAndRecord', {
     typeUrl: '/erprollup.ledger.MsgSendAndRecord',
-    encode: (value) => ({
-      creator: value.creator,
-      receiver: value.receiver,
-      amount: value.amount,
-      debitGroup: value.debitGroup,
-      creditGroup: value.creditGroup,
-      description: value.description
-    })
+    encode: (value) => {
+      const creator = new TextEncoder().encode(value.creator);
+      const receiver = new TextEncoder().encode(value.receiver);
+      const amountDenom = new TextEncoder().encode(value.amount.denom);
+      const amountValue = new TextEncoder().encode(value.amount.amount);
+      const debitGroup = new TextEncoder().encode(value.debitGroup);
+      const creditGroup = new TextEncoder().encode(value.creditGroup);
+      const description = new TextEncoder().encode(value.description || '');
+      
+      const result = new Uint8Array(
+        4 + creator.length + 
+        4 + receiver.length + 
+        4 + amountDenom.length +
+        4 + amountValue.length +
+        4 + debitGroup.length + 
+        4 + creditGroup.length +
+        4 + description.length
+      );
+      
+      let offset = 0;
+      const view = new DataView(result.buffer);
+      
+      // Creator
+      view.setUint32(offset, creator.length, true);
+      offset += 4;
+      result.set(creator, offset);
+      offset += creator.length;
+      
+      // Receiver
+      view.setUint32(offset, receiver.length, true);
+      offset += 4;
+      result.set(receiver, offset);
+      offset += receiver.length;
+      
+      // Amount denom
+      view.setUint32(offset, amountDenom.length, true);
+      offset += 4;
+      result.set(amountDenom, offset);
+      offset += amountDenom.length;
+      
+      // Amount value
+      view.setUint32(offset, amountValue.length, true);
+      offset += 4;
+      result.set(amountValue, offset);
+      offset += amountValue.length;
+      
+      // DebitGroup
+      view.setUint32(offset, debitGroup.length, true);
+      offset += 4;
+      result.set(debitGroup, offset);
+      offset += debitGroup.length;
+      
+      // CreditGroup
+      view.setUint32(offset, creditGroup.length, true);
+      offset += 4;
+      result.set(creditGroup, offset);
+      offset += creditGroup.length;
+      
+      // Description
+      view.setUint32(offset, description.length, true);
+      offset += 4;
+      result.set(description, offset);
+      
+      return result;
+    }
   });
   
   return registry;
@@ -117,8 +252,7 @@ export const createGroup = async (wallet, name, description) => {
           denom: "stake",
           amount: "50",
         },
-      ],
-      gas: "200000",
+      ]
     };
 
     const result = await client.signAndBroadcast(
